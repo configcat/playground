@@ -24,6 +24,8 @@
     "@nestjs/platform-express": "10.3.10",
     "@nestjs/serve-static": "^4.0.2",
     "@openfeature/env-var-provider": "^0.3.0",
+    "@openfeature/config-cat-provider": "^0.7.1",
+    "@openfeature/config-cat-web-provider": "^0.1.1",
     "@openfeature/flagd-provider": "^0.13.0",
     "@openfeature/flagd-web-provider": "^0.7.0",
     "@openfeature/flipt-provider": "^0.1.0",

@@ -1,20 +1,21 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { FlagdProvider } from '@openfeature/flagd-provider';
-import { GoFeatureFlagProvider } from '@openfeature/go-feature-flag-provider';
-import { EnvVarProvider } from '@openfeature/env-var-provider';
-import { FlagsmithProvider } from '@openfeature/js-flagsmith-provider';
-import { OpenFeatureLaunchDarklyProvider } from '@openfeature/js-launchdarkly-provider';
-import { OpenFeature, Provider } from '@openfeature/server-sdk';
-import { OpenFeatureSplitProvider } from '@openfeature/js-split-provider';
-import { SplitFactory } from '@splitsoftware/splitio';
-import { CloudbeesProvider } from 'cloudbees-openfeature-provider-node';
-import Flagsmith from 'flagsmith-nodejs';
 import { Client } from '@harnessio/ff-nodejs-server-sdk';
-import { OpenFeatureHarnessProvider } from '@openfeature/js-harness-provider';
+import { Injectable, Logger } from '@nestjs/common';
+import { ConfigCatProvider } from '@openfeature/config-cat-provider';
+import { EnvVarProvider } from '@openfeature/env-var-provider';
 import { OpenFeatureLogger } from '@openfeature/extra';
+import { FlagdProvider } from '@openfeature/flagd-provider';
+import { FliptProvider } from '@openfeature/flipt-provider';
+import { GoFeatureFlagProvider } from '@openfeature/go-feature-flag-provider';
+import { FlagsmithProvider } from '@openfeature/js-flagsmith-provider';
+import { OpenFeatureHarnessProvider } from '@openfeature/js-harness-provider';
+import { OpenFeatureLaunchDarklyProvider } from '@openfeature/js-launchdarkly-provider';
+import { OpenFeatureSplitProvider } from '@openfeature/js-split-provider';
+import { OFREPProvider } from '@openfeature/ofrep-provider';
+import { OpenFeature, Provider } from '@openfeature/server-sdk';
 import {
   AvailableProvider,
   CB_PROVIDER_ID,
+  CONFIGCAT_PROVIDER_ID,
   ENV_PROVIDER_ID,
   FLAGD_OFREP_PROVIDER_ID,
   FLAGD_PROVIDER_ID,
@@ -26,8 +27,9 @@ import {
   ProviderId,
   SPLIT_PROVIDER_ID,
 } from '@openfeature/utils';
-import { OFREPProvider } from '@openfeature/ofrep-provider';
-import { FliptProvider } from '@openfeature/flipt-provider';
+import { SplitFactory } from '@splitsoftware/splitio';
+import { CloudbeesProvider } from 'cloudbees-openfeature-provider-node';
+import Flagsmith from 'flagsmith-nodejs';
 
 type ProviderMap = Record<
   ProviderId,
@@ -170,6 +172,18 @@ export class ProviderService {
       },
       available: () => !!process.env.FLIPT_URL,
       url: process.env.FLIPT_WEB_URL,
+    },
+    [CONFIGCAT_PROVIDER_ID]: {
+      factory: () => {
+        const sdkKey = process.env.CONFIGCAT_SDK_KEY;
+        if (!sdkKey) {
+          throw new Error('"CONFIGCAT_SDK_KEY" must be defined.');
+        } else {
+          return ConfigCatProvider.create(sdkKey);
+        }
+      },
+      available: () => !!process.env.CONFIGCAT_SDK_KEY && !!process.env.CONFIGCAT_SDK_KEY_WEB,
+      webCredential: process.env.CONFIGCAT_SDK_KEY_WEB,
     },
   };
 

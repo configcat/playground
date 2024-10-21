@@ -2,7 +2,7 @@ FROM node:20.16-bullseye AS builder
 WORKDIR /tmp/playground/
 COPY package*.json tsconfig*.json nx.json babel.config.json ./
 COPY schemas/ ./schemas/
-RUN npm ci
+RUN npm ci --force
 COPY packages/ ./packages/
 RUN npm run build:app
 
@@ -10,7 +10,7 @@ FROM node:20-alpine as app
 
 WORKDIR /opt/playground/
 COPY package*.json ./
-RUN npm ci --omit=dev
+RUN npm ci --omit=dev --force
 
 COPY --from=builder /tmp/playground/dist ./dist
 # Tracing script
